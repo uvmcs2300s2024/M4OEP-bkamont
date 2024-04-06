@@ -62,6 +62,9 @@ void Engine::initShaders() {
 void Engine::initShapes() {
     user = make_unique<Rect>(shapeShader, vec2(width, height), vec2(0, 0), background); // placeholder for compilation
 
+    // Need to create randomly generated ground.
+
+
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
@@ -155,6 +158,8 @@ void Engine::update() {
         }
     }
 
+    // Need to make standing ground randomly generate
+
 }
 
 void Engine::render() {
@@ -176,6 +181,11 @@ void Engine::render() {
 
     ground->setUniforms();
     ground->draw();
+
+    for (const unique_ptr<Rect>& g : standingGround) {
+        g->setUniforms();
+        g->draw();
+    }
 
 
 

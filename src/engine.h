@@ -34,6 +34,7 @@ class Engine {
 
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
+        vector<unique_ptr<Rect>> standingGround; // Ground user runs on
         unique_ptr<Rect> user;
         vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
         vector<unique_ptr<Triangle>> mountains2;
