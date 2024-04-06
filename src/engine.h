@@ -33,11 +33,9 @@ class Engine {
         unique_ptr<ShaderManager> shaderManager;
 
         unique_ptr<Rect> grass;
-        vector<unique_ptr<Rect>> buildings1;
-        vector<unique_ptr<Rect>> buildings2;
-        vector<unique_ptr<Rect>> buildings3;
         unique_ptr<Rect> user;
-        vector<unique_ptr<Triangle>> mountains;
+        vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
+        vector<unique_ptr<Triangle>> mountains2;
 
         Shader shapeShader;
 
