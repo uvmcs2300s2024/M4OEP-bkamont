@@ -1,17 +1,12 @@
 #include "engine.h"
 #include <iostream>
 
-const color skyBlue(77/255.0, 213/255.0, 240/255.0);
-const color grassGreen(26/255.0, 176/255.0, 56/255.0);
-const color darkGreen(27/255.0, 81/255.0, 45/255.0);
-const color white(1, 1, 1);
-const color brickRed(201/255.0, 20/255.0, 20/255.0);
-const color darkBlue(1/255.0, 110/255.0, 214/255.0);
-const color purple(119/255.0, 11/255.0, 224/255.0);
-const color black(0, 0, 0);
-const color magenta(1, 0, 1);
-const color orange(1, 163/255.0, 22/255.0);
-const color cyan (0, 1, 1);
+const color background(204/255.0, 230/255.0, 255/255.0);
+const color mountainColorLighter(179/255.0, 218/255.0, 255/255.0); //
+const color mountainColorDarker(128/255.0, 193/255.0, 255/255.0);
+const color groundColor (0/255.0, 20/255.0, 77/255.0);
+const color groundColor2 (0/255.0, 92/255.0, 179/255.0);
+
 
 Engine::Engine() : keys() {
     this->initWindow();
@@ -65,46 +60,35 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
-    // TODO: Initialize the user to be a 10x10 white block
-    //       centered at (0, 0)
-    user = make_unique<Rect>(shapeShader, vec2(width, height), vec2(0, 0), black); // placeholder for compilation
+    user = make_unique<Rect>(shapeShader, vec2(width, height), vec2(0, 0), background); // placeholder for compilation
 
-    // Init grass
-    grass = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, height / 3), grassGreen);
+    // Ground color
+    ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
-    // Init mountains
-    mountains.push_back(make_unique<Triangle>(shapeShader, vec2(width/4, 300), vec2(width, 400), darkGreen));
-    mountains.push_back(make_unique<Triangle>(shapeShader, vec2(2*width/3, 300), vec2(width, 500), darkGreen));
+    // Ground color
+    ground2 = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, height / 3), groundColor2);
 
-    // Init buildings from closest to furthest
-    int totalBuildingWidth = 0;
-    vec2 buildingSize;
-    while (totalBuildingWidth < width + 50) {
-        // Building height between 50-100
-        buildingSize.y = rand() % 51 + 50;
-        // Building width between 30-50
-        buildingSize.x = rand() % 21 + 30;
-        buildings1.push_back(make_unique<Rect>(shapeShader,
-                                               vec2(totalBuildingWidth + (buildingSize.x / 2.0) + 5,
-                                                    ((buildingSize.y / 2.0) + 50)),
-                                               buildingSize, brickRed));
-        totalBuildingWidth += buildingSize.x + 5;
+    int totalMountainWidth = 0;
+    vec2 mountainSize;
+    while (totalMountainWidth < width + 100) {
+        mountainSize.y = rand() % 101 + 200;
+        mountainSize.x = rand() % 101 + 500;
+        mountains.push_back(make_unique<Triangle>(shapeShader,
+                                               vec2(totalMountainWidth + (mountainSize.x / 2.0) + 5,
+                                                    ((mountainSize.y / 2.0) + 50)),
+                                                  mountainSize, mountainColorLighter));
+        totalMountainWidth += mountainSize.x + 5;
     }
-    // Populate second set of buildings
-    totalBuildingWidth = 0;
-    while (totalBuildingWidth < width + 100) {
-        // TODO: Populate this vector of darkBlue buildings
-        // Building height between 100-200
-        // Building width between 50-100
-        totalBuildingWidth += buildingSize.x + 5;
-    }
-    // Populate third set of buildings
-    totalBuildingWidth = 0;
-    while (totalBuildingWidth < width + 200) {
-        // TODO: Populate this vector of purple buildings
-        // Building height between 200-400
-        // Building width between 100-200
-        totalBuildingWidth += buildingSize.x + 5;
+
+    totalMountainWidth = 0;
+    while (totalMountainWidth < width + 200) {
+        mountainSize.y = rand() % 101 + 300;
+        mountainSize.x = rand() % 101 + 600;
+        mountains2.push_back(make_unique<Triangle>(shapeShader,
+                                                  vec2(totalMountainWidth + (mountainSize.x / 2.0) + 5,
+                                                       ((mountainSize.y / 2.0) + 50)),
+                                                   mountainSize, mountainColorDarker));
+        totalMountainWidth += mountainSize.x + 5;
     }
 }
 
@@ -129,15 +113,6 @@ void Engine::processInput() {
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
-    // TODO: make the user move with the mouse
-
-    for (const unique_ptr<Rect>& r : buildings1) {
-        if (r->isOverlapping(*user)) {
-            r->setColor(orange);
-        } else {
-            r->setColor(brickRed);
-        }
-    }
 
     // TODO: Update the colors of buildings2 and buildings3.
     //  Note that darkBlue buildings turn cyan when overlapping
@@ -159,38 +134,49 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    // Update buildings
-    for (int i = 0; i < buildings1.size(); ++i) {
-        // Move all the red buildings to the left
-        buildings1[i]->moveX(-1.5);
-        // If a building has moved off the screen
-        if (buildings1[i]->getPosX() < -(buildings1[i]->getSize().x/2)) {
+    // Have the mountains move
+    for (int i = 0; i < mountains.size(); ++i) {
+        mountains[i]->moveX(-.5);
+        // If a mountain has moved off the screen
+        if (mountains[i]->getPosX() < -(mountains[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
-            int buildingOnLeft = (buildings1[i] == buildings1[0]) ? buildings1.size()-1 : i - 1;
-            buildings1[i]->setPosX(buildings1[buildingOnLeft]->getPosX() + buildings1[buildingOnLeft]->getSize().x/2 + buildings1[i]->getSize().x/2 + 5);
+            int buildingOnLeft = (mountains[i] == mountains[0]) ? mountains.size()-1 : i - 1;
+            mountains[i]->setPosX(mountains[buildingOnLeft]->getPosX() + mountains[buildingOnLeft]->getSize().x/2 + mountains[i]->getSize().x/2 + 5);
         }
     }
 
-    // TODO: Make the other two vectors of buildings move.
-    //  The larger the buildings, the slower they should move.
+    for (int i = 0; i < mountains2.size(); ++i) {
+        mountains2[i]->moveX(-.5/2);
+        // If a mountain has moved off the screen
+        if (mountains2[i]->getPosX() < -(mountains2[i]->getSize().x/2)) {
+            // Set it to the right of the screen so that it passes through again
+            int buildingOnLeft = (mountains2[i] == mountains2[0]) ? mountains2.size()-1 : i - 1;
+            mountains2[i]->setPosX(mountains2[buildingOnLeft]->getPosX() + mountains2[buildingOnLeft]->getSize().x/2 + mountains2[i]->getSize().x/2 + 5);
+        }
+    }
 
 }
 
 void Engine::render() {
-    glClearColor(skyBlue.red,skyBlue.green, skyBlue.blue, 1.0f);
+    glClearColor(background.red,background.green, background.blue, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    for (const unique_ptr<Triangle>& m2 : mountains2) {
+        m2->setUniforms();
+        m2->draw();
+    }
 
     for (const unique_ptr<Triangle>& m : mountains) {
         m->setUniforms();
         m->draw();
     }
 
-    grass->setUniforms();
-    grass->draw();
+    ground2->setUniforms();
+    ground2->draw();
 
-    // TODO: Add logic to draw the the user and the buildings.
-    //  Note that the order of drawing matters because whatever
-    //  is drawn last appears on top.
+    ground->setUniforms();
+    ground->draw();
+
 
 
     glfwSwapBuffers(window);

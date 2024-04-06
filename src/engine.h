@@ -32,7 +32,8 @@ class Engine {
         /// @details Initialized in initShaders()
         unique_ptr<ShaderManager> shaderManager;
 
-        unique_ptr<Rect> grass;
+        unique_ptr<Rect> ground;
+        unique_ptr<Rect> ground2;
         unique_ptr<Rect> user;
         vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
         vector<unique_ptr<Triangle>> mountains2;
