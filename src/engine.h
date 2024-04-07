@@ -2,6 +2,7 @@
 #define GRAPHICS_ENGINE_H
 
 #include <vector>
+#include <array>
 #include <memory>
 #include <GLFW/glfw3.h>
 
@@ -34,7 +35,7 @@ class Engine {
 
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
-        vector<unique_ptr<Rect>> standingGround; // Ground user runs on
+        vector<unique_ptr<Rect>> standingGround; // Generated ground the user runs on
         unique_ptr<Rect> user;
         vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
         vector<unique_ptr<Triangle>> mountains2;
@@ -65,6 +66,10 @@ class Engine {
         /// @brief Processes input from the user.
         /// @details (e.g. keyboard input, mouse input, etc.)
         void processInput();
+
+        /// @brief generates the terrain
+        /// @details
+        void generateLand();
 
         /// @brief Updates the game state.
         /// @details (e.g. collision detection, delta time, etc.)

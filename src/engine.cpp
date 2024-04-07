@@ -60,10 +60,7 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
-    user = make_unique<Rect>(shapeShader, vec2(width, height), vec2(0, 0), background); // placeholder for compilation
-
-    // Need to create randomly generated ground.
-
+    user = make_unique<Rect>(shapeShader, vec2(width/2, height/2), vec2(100, 50), color{1, 0, 0, 1}); // placeholder for compilation
 
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
@@ -106,6 +103,7 @@ void Engine::processInput() {
             keys[key] = false;
     }
 
+    float speed = 200.0f * deltaTime;
     // Close window if escape key is pressed
     if (keys[GLFW_KEY_ESCAPE])
         glfwSetWindowShouldClose(window, true);
@@ -117,10 +115,6 @@ void Engine::processInput() {
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
 
-    // TODO: Update the colors of buildings2 and buildings3.
-    //  Note that darkBlue buildings turn cyan when overlapping
-    //  with the user, and purple buildings turn magenta.
-
 
     // If the user is overlapping with the top of the mountain,
     //  exit the program.
@@ -129,6 +123,10 @@ void Engine::processInput() {
             glfwSetWindowShouldClose(window, true);
         }
     }
+}
+
+void Engine::generateLand() {
+
 }
 
 void Engine::update() {
@@ -143,8 +141,8 @@ void Engine::update() {
         // If a mountain has moved off the screen
         if (mountains[i]->getPosX() < -(mountains[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
-            int buildingOnLeft = (mountains[i] == mountains[0]) ? mountains.size()-1 : i - 1;
-            mountains[i]->setPosX(mountains[buildingOnLeft]->getPosX() + mountains[buildingOnLeft]->getSize().x/2 + mountains[i]->getSize().x/2 + 5);
+            int mountainOnLeft = (mountains[i] == mountains[0]) ? mountains.size()-1 : i - 1;
+            mountains[i]->setPosX(mountains[mountainOnLeft]->getPosX() + mountains[mountainOnLeft]->getSize().x/2 + mountains[i]->getSize().x/2 + 5);
         }
     }
 
@@ -153,8 +151,8 @@ void Engine::update() {
         // If a mountain has moved off the screen
         if (mountains2[i]->getPosX() < -(mountains2[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
-            int buildingOnLeft = (mountains2[i] == mountains2[0]) ? mountains2.size()-1 : i - 1;
-            mountains2[i]->setPosX(mountains2[buildingOnLeft]->getPosX() + mountains2[buildingOnLeft]->getSize().x/2 + mountains2[i]->getSize().x/2 + 5);
+            int mountainOnLeft = (mountains2[i] == mountains2[0]) ? mountains2.size()-1 : i - 1;
+            mountains2[i]->setPosX(mountains2[mountainOnLeft]->getPosX() + mountains2[mountainOnLeft]->getSize().x/2 + mountains2[i]->getSize().x/2 + 5);
         }
     }
 
@@ -187,7 +185,8 @@ void Engine::render() {
         g->draw();
     }
 
-
+    user->setUniforms();
+    user->draw();
 
     glfwSwapBuffers(window);
 }

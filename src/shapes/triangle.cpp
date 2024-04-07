@@ -17,7 +17,7 @@ Triangle::~Triangle() {
 
 void Triangle::draw() const {
     glBindVertexArray(this->VAO);
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
@@ -25,7 +25,8 @@ void Triangle::initVectors() {
     this->vertices.insert(this->vertices.end(), {
             -0.5f, -0.5f,  // Bottom left
             0.5f, -0.5f,   // Bottom right
-            0.0f, 0.5f     // Top
+            0.0f, 0.5f,    // Top
+
     });
 
     this->indices.insert(this->indices.end(), {
