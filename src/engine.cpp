@@ -6,6 +6,7 @@ const color mountainColorLighter(179/255.0, 218/255.0, 255/255.0); //
 const color mountainColorDarker(128/255.0, 193/255.0, 255/255.0);
 const color groundColor (0/255.0, 20/255.0, 77/255.0);
 const color groundColor2 (0/255.0, 92/255.0, 179/255.0);
+const color black (0/255.0, 0/255.0, 0/255.0);
 
 
 Engine::Engine() : keys() {
@@ -60,13 +61,25 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
-    user = make_unique<Rect>(shapeShader, vec2(width/2, height/2), vec2(100, 50), color{1, 0, 0, 1}); // placeholder for compilation
+    user = make_unique<Rect>(shapeShader, vec2(100 , height/2), vec2(100, 50), black); // placeholder for compilation
 
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
     // Ground color
     ground2 = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, height / 3), groundColor2);
+
+    int totalGroundWidth = 0;
+    vec2 groundSize;
+    while (totalGroundWidth < width + 100) {
+        groundSize.y = rand() % 100 + 20;
+        groundSize.x = rand() % 10 + 50;
+        standingGround.push_back(make_unique<Rect>(shapeShader,
+                                                   vec2(totalGroundWidth + (groundSize.x / 2.0),
+                                                        ((groundSize.y/ 2.0) + 100)),
+                                                   groundSize, black));
+        totalGroundWidth += groundSize.x + 5;
+    }
 
     int totalMountainWidth = 0;
     vec2 mountainSize;
@@ -103,7 +116,6 @@ void Engine::processInput() {
             keys[key] = false;
     }
 
-    float speed = 200.0f * deltaTime;
     // Close window if escape key is pressed
     if (keys[GLFW_KEY_ESCAPE])
         glfwSetWindowShouldClose(window, true);
@@ -113,6 +125,15 @@ void Engine::processInput() {
 
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
+
+    float speed = 200.0f * deltaTime;
+
+    // make the user jump if the hit space
+    double regPos = user->getPosY();
+
+    if(keys[GLFW_KEY_SPACE]){
+
+    }
 
 
 
@@ -140,9 +161,10 @@ void Engine::update() {
         mountains[i]->moveX(-.5);
         // If a mountain has moved off the screen
         if (mountains[i]->getPosX() < -(mountains[i]->getSize().x/2)) {
+            int s = rand() % 30;
             // Set it to the right of the screen so that it passes through again
             int mountainOnLeft = (mountains[i] == mountains[0]) ? mountains.size()-1 : i - 1;
-            mountains[i]->setPosX(mountains[mountainOnLeft]->getPosX() + mountains[mountainOnLeft]->getSize().x/2 + mountains[i]->getSize().x/2 + 5);
+            mountains[i]->setPosX(mountains[mountainOnLeft]->getPosX() + mountains[mountainOnLeft]->getSize().x/s + mountains[i]->getSize().x/s + s);
         }
     }
 
@@ -156,6 +178,16 @@ void Engine::update() {
         }
     }
 
+    for (int i = 0; i < standingGround.size(); ++i) {
+        standingGround[i]->moveX(-.5/2);
+        // If a mountain has moved off the screen
+        if (standingGround[i]->getPosX() < -(standingGround[i]->getSize().x/2)) {
+            // Set it to the right of the screen so that it passes through again
+            int mountainOnLeft = (standingGround[i] == standingGround[0]) ? standingGround.size()-1 : i - 1;
+            standingGround[i]->setPosX(standingGround[mountainOnLeft]->getPosX() + standingGround[mountainOnLeft]->getSize().x/2 + standingGround[i]->getSize().x/2 + 5);
+        }
+    }
+
     // Need to make standing ground randomly generate
 
 }
@@ -163,7 +195,7 @@ void Engine::update() {
 void Engine::render() {
     glClearColor(background.red,background.green, background.blue, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
+/*
     for (const unique_ptr<Triangle>& m2 : mountains2) {
         m2->setUniforms();
         m2->draw();
@@ -172,7 +204,7 @@ void Engine::render() {
     for (const unique_ptr<Triangle>& m : mountains) {
         m->setUniforms();
         m->draw();
-    }
+    }*/
 
     ground2->setUniforms();
     ground2->draw();
@@ -187,6 +219,7 @@ void Engine::render() {
 
     user->setUniforms();
     user->draw();
+
 
     glfwSwapBuffers(window);
 }
