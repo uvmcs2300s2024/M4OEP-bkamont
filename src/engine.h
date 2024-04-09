@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <iostream>
 #include <memory>
 #include <GLFW/glfw3.h>
 
@@ -11,7 +12,7 @@
 #include "shapes/shape.h"
 #include "shapes/triangle.h"
 
-using std::vector, std::unique_ptr, std::make_unique, glm::ortho, glm::mat4, glm::vec3, glm::vec4;
+using std::vector, std::unique_ptr, std::make_unique, glm::ortho, glm::mat4, glm::vec3, glm::vec4 ;
 
 /**
  * @brief The Engine class.
@@ -40,9 +41,14 @@ class Engine {
         vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
         vector<unique_ptr<Triangle>> mountains2;
 
+        // Shapes
+        vector<unique_ptr<Shape>> squares;
+
         Shader shapeShader;
 
         double MouseX, MouseY;
+
+        const int SIDE_LENGTH = 5;
 
     public:
         /// @brief Constructor for the Engine class.
@@ -78,6 +84,10 @@ class Engine {
         /// @brief Renders the game state.
         /// @details Displays/renders objects on the screen.
         void render();
+
+
+        /// @brief Populates squares vector with input from file.
+        void readFromFile(string filepath);
 
         /* deltaTime variables */
         float deltaTime = 0.0f; // Time between current frame and last frame

@@ -62,7 +62,7 @@ void Engine::initShaders() {
 
 void Engine::initShapes() {
     user = make_unique<Rect>(shapeShader, vec2(100 , height/2), vec2(100, 50), black); // placeholder for compilation
-
+    readFromFile("../res/art/scene.txt");
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
@@ -71,13 +71,13 @@ void Engine::initShapes() {
 
     int totalGroundWidth = 0;
     vec2 groundSize;
-    while (totalGroundWidth < width + 100) {
-        groundSize.y = rand() % 100 + 20;
-        groundSize.x = rand() % 10 + 50;
+    while (totalGroundWidth < width + 400) {
+        groundSize.y = rand() % 20 + 21;
+        groundSize.x = rand() % 15 + 30;
         standingGround.push_back(make_unique<Rect>(shapeShader,
-                                                   vec2(totalGroundWidth + (groundSize.x / 2.0),
-                                                        ((groundSize.y/ 2.0) + 100)),
-                                                   groundSize, black));
+                                                  vec2(totalGroundWidth + (groundSize.x / 2.0) + 100,
+                                                       ((groundSize.y / 2.0) + 100)),
+                                                  groundSize, mountainColorLighter));
         totalGroundWidth += groundSize.x + 5;
     }
 
@@ -217,11 +217,51 @@ void Engine::render() {
         g->draw();
     }
 
-    user->setUniforms();
-    user->draw();
+    shapeShader.use();
+
+    for(unique_ptr<Shape> &square : squares){
+        square->setUniforms();
+        square->draw();
+    }
 
 
     glfwSwapBuffers(window);
+}
+
+void Engine::readFromFile(std::string filepath) {
+    ifstream ins(filepath);
+
+    if (!ins) {
+        cout << "Error opening file" << endl;
+    }
+    ins >> std::noskipws;
+    int xCoord = 0, yCoord = height;
+    char letter;
+    bool draw;
+    color c;
+    while (ins >> letter) {
+        draw = true;
+        switch(letter) {
+            case 'r': c = color(1, 0, 0); break;
+            case 'g': c = color(40/255.0, 193/255.0, 249/255.0); break;
+            case 'b': c = color(0, 0, 1); break;
+            case 'y': c = color(1, 1, 0); break;
+            case 'm': c = color(1, 0, 1); break;
+            case 'c': c = color(0, 1, 1); break;
+            case ' ': c = color(0, 0, 0); break;
+            case 'w': c = color(1, 1, 1); break;
+            case 'k': c = color(0, 0, 0); break;
+            default: // newline
+                draw = false;
+                xCoord = 0;
+                yCoord -= SIDE_LENGTH;
+        }
+        if (draw) {
+            squares.push_back(make_unique<Rect>(shapeShader, vec2(xCoord + SIDE_LENGTH/2, yCoord + SIDE_LENGTH/2), vec2(SIDE_LENGTH, SIDE_LENGTH), c));
+            xCoord += SIDE_LENGTH;
+        }
+    }
+    ins.close();
 }
 
 bool Engine::shouldClose() {
