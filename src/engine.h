@@ -81,6 +81,8 @@ class Engine {
         /// @details
         void jump();
 
+        void fall();
+
         /// @brief Updates the game state.
         /// @details (e.g. collision detection, delta time, etc.)
         void update();

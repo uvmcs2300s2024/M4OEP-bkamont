@@ -131,23 +131,22 @@ void Engine::processInput() {
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
-    float speed = 200.0f * deltaTime;
 
-    // make the user jump if the hit space
-    double regPos = user->getPosY();
+    // Get the regular position of the unicorn
+    float regPos = squares[0]->getPosY();
 
-    // Need to make a jump method that gets called
+    // if the user hits the up arrow the unicorn jumps
     if(keys[GLFW_KEY_UP]){
-
-        jump();
+        for(int i = 0; i < squares.size(); i++){
+            if(squares[0]->getPosY() < 500){
+                jump();
+            }
+        }
     }
 
     if(keys[GLFW_KEY_DOWN]){
-        // Loop the move position of squares
-        int i  = 0;
-        while(i < squares.size()){
-            squares[i]->moveY(-speed);
-            i++;
+        while(squares[0]->getPosY() > regPos){
+            fall();
         }
     }
 
@@ -161,15 +160,23 @@ void Engine::processInput() {
 }
 
 void Engine::jump() {
-    float speed = 200.0f * deltaTime;
     // Loop the move position of squares
     int i  = 0;
     while(i < squares.size()){
-        squares[i]->setPosY(squares[i]->getPosY() + 10);
+        squares[i]->setPosY(squares[i]->getPosY() + 2);
         i++;
     }
-
 }
+
+void Engine::fall(){
+    // Loop the move position of squares
+    int i  = 0;
+    while(i < squares.size()){
+        squares[i]->setPosY(squares[i]->getPosY() - 2);
+        i++;
+    }
+}
+
 
 void Engine::update() {
     // Calculate delta time
