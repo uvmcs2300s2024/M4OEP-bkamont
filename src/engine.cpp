@@ -1,6 +1,8 @@
 #include "engine.h"
 #include <iostream>
 
+using namespace std;
+
 const color background(204/255.0, 230/255.0, 255/255.0);
 const color mountainColorLighter(179/255.0, 218/255.0, 255/255.0); //
 const color mountainColorDarker(128/255.0, 193/255.0, 255/255.0);
@@ -62,7 +64,6 @@ void Engine::initShaders() {
 
 void Engine::initShapes() {
     user = make_unique<Rect>(shapeShader, vec2(100 , height/2), vec2(100, 50), black); // placeholder for compilation
-    readFromFile("../res/art/scene.txt");
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
@@ -103,6 +104,8 @@ void Engine::initShapes() {
                                                    mountainSize, mountainColorDarker));
         totalMountainWidth += mountainSize.x + 5;
     }
+
+    readFromFile("../res/art/scene.txt");
 }
 
 void Engine::processInput() {
@@ -115,6 +118,8 @@ void Engine::processInput() {
         else if (glfwGetKey(window, key) == GLFW_RELEASE)
             keys[key] = false;
     }
+
+    int y = 0;
 
     // Close window if escape key is pressed
     if (keys[GLFW_KEY_ESCAPE])
@@ -131,11 +136,20 @@ void Engine::processInput() {
     // make the user jump if the hit space
     double regPos = user->getPosY();
 
-    if(keys[GLFW_KEY_SPACE]){
+    // Need to make a jump method that gets called
+    if(keys[GLFW_KEY_UP]){
 
+        jump();
     }
 
-
+    if(keys[GLFW_KEY_DOWN]){
+        // Loop the move position of squares
+        int i  = 0;
+        while(i < squares.size()){
+            squares[i]->moveY(-speed);
+            i++;
+        }
+    }
 
     // If the user is overlapping with the top of the mountain,
     //  exit the program.
@@ -146,7 +160,14 @@ void Engine::processInput() {
     }
 }
 
-void Engine::generateLand() {
+void Engine::jump() {
+    float speed = 200.0f * deltaTime;
+    // Loop the move position of squares
+    int i  = 0;
+    while(i < squares.size()){
+        squares[i]->setPosY(squares[i]->getPosY() + 10);
+        i++;
+    }
 
 }
 
@@ -156,6 +177,8 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
+    // TODO need to fix something with the mountains. They randomly cause the program to shut down after a while.
+    /*
     // Have the mountains move
     for (int i = 0; i < mountains.size(); ++i) {
         mountains[i]->moveX(-.5);
@@ -177,55 +200,8 @@ void Engine::update() {
             mountains2[i]->setPosX(mountains2[mountainOnLeft]->getPosX() + mountains2[mountainOnLeft]->getSize().x/2 + mountains2[i]->getSize().x/2 + 5);
         }
     }
+     */
 
-    for (int i = 0; i < standingGround.size(); ++i) {
-        standingGround[i]->moveX(-.5/2);
-        // If a mountain has moved off the screen
-        if (standingGround[i]->getPosX() < -(standingGround[i]->getSize().x/2)) {
-            // Set it to the right of the screen so that it passes through again
-            int mountainOnLeft = (standingGround[i] == standingGround[0]) ? standingGround.size()-1 : i - 1;
-            standingGround[i]->setPosX(standingGround[mountainOnLeft]->getPosX() + standingGround[mountainOnLeft]->getSize().x/2 + standingGround[i]->getSize().x/2 + 5);
-        }
-    }
-
-    // Need to make standing ground randomly generate
-
-}
-
-void Engine::render() {
-    glClearColor(background.red,background.green, background.blue, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-/*
-    for (const unique_ptr<Triangle>& m2 : mountains2) {
-        m2->setUniforms();
-        m2->draw();
-    }
-
-    for (const unique_ptr<Triangle>& m : mountains) {
-        m->setUniforms();
-        m->draw();
-    }*/
-
-    ground2->setUniforms();
-    ground2->draw();
-
-    ground->setUniforms();
-    ground->draw();
-
-    for (const unique_ptr<Rect>& g : standingGround) {
-        g->setUniforms();
-        g->draw();
-    }
-
-    shapeShader.use();
-
-    for(unique_ptr<Shape> &square : squares){
-        square->setUniforms();
-        square->draw();
-    }
-
-
-    glfwSwapBuffers(window);
 }
 
 void Engine::readFromFile(std::string filepath) {
@@ -242,18 +218,18 @@ void Engine::readFromFile(std::string filepath) {
     while (ins >> letter) {
         draw = true;
         switch(letter) {
+            case ' ': draw = false; xCoord += SIDE_LENGTH; break;
             case 'r': c = color(1, 0, 0); break;
             case 'g': c = color(40/255.0, 193/255.0, 249/255.0); break;
             case 'b': c = color(0, 0, 1); break;
             case 'y': c = color(1, 1, 0); break;
             case 'm': c = color(1, 0, 1); break;
             case 'c': c = color(0, 1, 1); break;
-            case ' ': c = color(0, 0, 0); break;
             case 'w': c = color(1, 1, 1); break;
             case 'k': c = color(0, 0, 0); break;
             default: // newline
                 draw = false;
-                xCoord = 0;
+                xCoord = width/9;
                 yCoord -= SIDE_LENGTH;
         }
         if (draw) {
@@ -263,6 +239,38 @@ void Engine::readFromFile(std::string filepath) {
     }
     ins.close();
 }
+
+void Engine::render() {
+    glClearColor(background.red,background.green, background.blue, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    for (const unique_ptr<Triangle>& m2 : mountains2) {
+        m2->setUniforms();
+        m2->draw();
+    }
+    /*
+
+    for (const unique_ptr<Triangle>& m : mountains) {
+        m->setUniforms();
+        m->draw();
+    }*/
+
+    ground2->setUniforms();
+    ground2->draw();
+
+    ground->setUniforms();
+    ground->draw();
+
+    shapeShader.use();
+
+    for(unique_ptr<Shape> &square : squares){
+        square->setUniforms();
+        square->draw();
+    }
+
+    glfwSwapBuffers(window);
+}
+
 
 bool Engine::shouldClose() {
     return glfwWindowShouldClose(window);

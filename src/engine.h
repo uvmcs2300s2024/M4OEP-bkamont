@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <GLFW/glfw3.h>
 
@@ -41,10 +42,13 @@ class Engine {
         vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
         vector<unique_ptr<Triangle>> mountains2;
 
+
         // Shapes
         vector<unique_ptr<Shape>> squares;
 
+        // Shaders
         Shader shapeShader;
+        Shader textShader;
 
         double MouseX, MouseY;
 
@@ -75,19 +79,19 @@ class Engine {
 
         /// @brief generates the terrain
         /// @details
-        void generateLand();
+        void jump();
 
         /// @brief Updates the game state.
         /// @details (e.g. collision detection, delta time, etc.)
         void update();
 
-        /// @brief Renders the game state.
-        /// @details Displays/renders objects on the screen.
-        void render();
-
 
         /// @brief Populates squares vector with input from file.
         void readFromFile(string filepath);
+
+        /// @brief Renders the game state.
+        /// @details Displays/renders objects on the screen.
+        void render();
 
         /* deltaTime variables */
         float deltaTime = 0.0f; // Time between current frame and last frame
