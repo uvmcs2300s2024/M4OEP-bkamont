@@ -156,6 +156,7 @@ void Engine::processInput() {
     }
 }
 
+// Jump method to have the character jump
 void Engine::jump() {
     // Loop the move position of squares
     int i  = 0;
@@ -165,6 +166,7 @@ void Engine::jump() {
     }
 }
 
+// Fall method to have the character fall after jumping.
 void Engine::fall(){
     // Loop the move position of squares
     int i  = 0;
@@ -181,30 +183,7 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    // TODO need to fix something with the mountains. They randomly cause the program to shut down after a while.
-    /*
-    // Have the mountains move
-    for (int i = 0; i < mountains.size(); ++i) {
-        mountains[i]->moveX(-.5);
-        // If a mountain has moved off the screen
-        if (mountains[i]->getPosX() < -(mountains[i]->getSize().x/2)) {
-            int s = rand() % 30;
-            // Set it to the right of the screen so that it passes through again
-            int mountainOnLeft = (mountains[i] == mountains[0]) ? mountains.size()-1 : i - 1;
-            mountains[i]->setPosX(mountains[mountainOnLeft]->getPosX() + mountains[mountainOnLeft]->getSize().x/s + mountains[i]->getSize().x/s + s);
-        }
-    }
 
-    for (int i = 0; i < mountains2.size(); ++i) {
-        mountains2[i]->moveX(-.5/2);
-        // If a mountain has moved off the screen
-        if (mountains2[i]->getPosX() < -(mountains2[i]->getSize().x/2)) {
-            // Set it to the right of the screen so that it passes through again
-            int mountainOnLeft = (mountains2[i] == mountains2[0]) ? mountains2.size()-1 : i - 1;
-            mountains2[i]->setPosX(mountains2[mountainOnLeft]->getPosX() + mountains2[mountainOnLeft]->getSize().x/2 + mountains2[i]->getSize().x/2 + 5);
-        }
-    }
-     */
 
 }
 
