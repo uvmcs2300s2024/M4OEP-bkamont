@@ -125,6 +125,7 @@ void Engine::processInput() {
     if (keys[GLFW_KEY_ESCAPE])
         glfwSetWindowShouldClose(window, true);
 
+
     // Mouse position saved to check for collisions
     glfwGetCursorPos(window, &MouseX, &MouseY);
 
@@ -133,22 +134,18 @@ void Engine::processInput() {
 
 
     // Get the regular position of the unicorn
-    float regPos = squares[0]->getPosY();
 
     // if the user hits the up arrow the unicorn jumps
     if(keys[GLFW_KEY_UP]){
-        for(int i = 0; i < squares.size(); i++){
-            if(squares[0]->getPosY() < 500){
-                jump();
-            }
+        if(squares[0]->getPosY() < 500){
+            jump();
         }
     }
 
-    if(keys[GLFW_KEY_DOWN]){
-        while(squares[0]->getPosY() > regPos){
-            fall();
-        }
+    if(squares[0]->getPosY() > 362){
+        fall();
     }
+
 
     // If the user is overlapping with the top of the mountain,
     //  exit the program.
@@ -163,7 +160,7 @@ void Engine::jump() {
     // Loop the move position of squares
     int i  = 0;
     while(i < squares.size()){
-        squares[i]->setPosY(squares[i]->getPosY() + 2);
+        squares[i]->setPosY(squares[i]->getPosY() + 3);
         i++;
     }
 }
@@ -172,7 +169,7 @@ void Engine::fall(){
     // Loop the move position of squares
     int i  = 0;
     while(i < squares.size()){
-        squares[i]->setPosY(squares[i]->getPosY() - 2);
+        squares[i]->setPosY(squares[i]->getPosY() - 1.5);
         i++;
     }
 }
