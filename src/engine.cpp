@@ -1,6 +1,9 @@
 #include "engine.h"
 #include <iostream>
 
+enum state {start, play, dead};
+state screen;
+
 using namespace std;
 
 const color background(204/255.0, 230/255.0, 255/255.0);
@@ -89,10 +92,6 @@ void Engine::initShapes() {
     int totalBlockWidth = 0;
     vec2 blockSize;
 
-    blocks.push_back(make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(0, 0), groundColor));
-    blocks.push_back(make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(0, 0), groundColor));
-    blocks.push_back(make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(0, 0), groundColor));
-
     while (totalBlockWidth < width + 60) {
         // Populate this vector of purple buildings
         // Building height between 300-350
@@ -131,6 +130,13 @@ void Engine::processInput() {
     // Mouse position saved to check for collisions
     glfwGetCursorPos(window, &MouseX, &MouseY);
 
+    // If we're in the start screen and the user presses s, change screen to play
+    // Hint: The index is GLFW_KEY_S
+    if ((screen == start) && keys[GLFW_KEY_S]){
+        screen = play;
+        switch(screen);
+    }
+
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
@@ -138,7 +144,7 @@ void Engine::processInput() {
     // Get the regular position of the unicorn
 
     // if the user hits the up arrow the unicorn jumps
-    if(keys[GLFW_KEY_UP]){
+    if((screen == play) && keys[GLFW_KEY_UP]){
         if(squares[0]->getPosY() < 600){
             jump();
         }
@@ -252,22 +258,39 @@ void Engine::render() {
     glClearColor(background.red,background.green, background.blue, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
     shapeShader.use();
 
-    for(unique_ptr<Shape> &square : squares){
-        square->setUniforms();
-        square->draw();
+    // Set shader to use for all shapes
+    shapeShader.use();
+
+    // Render differently depending on screen
+    switch (screen) {
+        case start: {
+            break;
+        }
+        case play: {
+            for(unique_ptr<Shape> &square : squares){
+                square->setUniforms();
+                square->draw();
+            }
+
+            standingGround->setUniforms();
+            standingGround->draw();
+
+            // Draw the ground
+            for (int n=0; n < blocks.size(); n++) {
+                blocks[n]->setUniforms();
+                blocks[n]->draw();
+            }
+
+            break;
+        }
+        case dead: {
+            // Display the message on the screen
+            break;
+        }
     }
 
-    standingGround->setUniforms();
-    standingGround->draw();
-
-    // Draw the ground
-    for (int n=0; n < blocks.size(); n++) {
-        blocks[n]->setUniforms();
-        blocks[n]->draw();
-    }
 
     glfwSwapBuffers(window);
 }
