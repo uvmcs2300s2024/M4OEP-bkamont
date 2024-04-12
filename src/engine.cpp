@@ -72,38 +72,18 @@ void Engine::initShapes() {
 
     int totalGroundWidth = 0;
     vec2 groundSize;
-    while (totalGroundWidth < width + 400) {
-        groundSize.y = rand() % 20 + 21;
-        groundSize.x = rand() % 15 + 30;
+    while (totalGroundWidth < width + 500) {
+        // Populate this vector of darkBlue buildings
+        groundSize.y = height/2;
+        // Building width between
+        groundSize.x = rand() % 301 + 200;
+
         standingGround.push_back(make_unique<Rect>(shapeShader,
-                                                  vec2(totalGroundWidth + (groundSize.x / 2.0) + 100,
-                                                       ((groundSize.y / 2.0) + 100)),
-                                                  groundSize, mountainColorLighter));
+                                               vec2(totalGroundWidth + (groundSize.x / 2.0) + 5, (groundSize.y/2.0) + -30),
+                                               groundSize, groundColor));
         totalGroundWidth += groundSize.x + 5;
     }
 
-    int totalMountainWidth = 0;
-    vec2 mountainSize;
-    while (totalMountainWidth < width + 100) {
-        mountainSize.y = rand() % 101 + 200;
-        mountainSize.x = rand() % 101 + 500;
-        mountains.push_back(make_unique<Triangle>(shapeShader,
-                                               vec2(totalMountainWidth + (mountainSize.x / 2.0) + 5,
-                                                    ((mountainSize.y / 2.0) + 50)),
-                                                  mountainSize, mountainColorLighter));
-        totalMountainWidth += mountainSize.x + 5;
-    }
-
-    totalMountainWidth = 0;
-    while (totalMountainWidth < width + 200) {
-        mountainSize.y = rand() % 101 + 300;
-        mountainSize.x = rand() % 101 + 600;
-        mountains2.push_back(make_unique<Triangle>(shapeShader,
-                                                  vec2(totalMountainWidth + (mountainSize.x / 2.0) + 5,
-                                                       ((mountainSize.y / 2.0) + 50)),
-                                                   mountainSize, mountainColorDarker));
-        totalMountainWidth += mountainSize.x + 5;
-    }
 
     readFromFile("../res/art/scene.txt");
 }
@@ -137,7 +117,7 @@ void Engine::processInput() {
 
     // if the user hits the up arrow the unicorn jumps
     if(keys[GLFW_KEY_UP]){
-        if(squares[0]->getPosY() < 500){
+        if(squares[0]->getPosY() < 600){
             jump();
         }
     }
@@ -146,6 +126,9 @@ void Engine::processInput() {
         fall();
     }
 
+    for (const unique_ptr<Shape>& s : squares) {
+
+    }
 
     // If the user is overlapping with the top of the mountain,
     //  exit the program.
@@ -183,7 +166,18 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-
+    // Update buildings
+    for (int i = 0; i < standingGround.size(); ++i) {
+        // Move all the red buildings to the left
+        standingGround[i]->moveX(-1);
+        // If a building has moved off the screen
+        if (standingGround[i]->getPosX() < -(standingGround[i]->getSize().x/2)) {
+            int pos = rand() % 51 + 100;
+            // Set it to the right of the screen so that it passes through again
+            int buildingOnLeft = (standingGround[i] == standingGround[0]) ? standingGround.size()-1 : i - 1;
+            standingGround[i]->setPosX(standingGround[buildingOnLeft]->getPosX() + standingGround[buildingOnLeft]->getSize().x/2 + standingGround[i]->getSize().x/2 + pos);
+        }
+    }
 
 }
 
@@ -227,28 +221,18 @@ void Engine::render() {
     glClearColor(background.red,background.green, background.blue, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for (const unique_ptr<Triangle>& m2 : mountains2) {
-        m2->setUniforms();
-        m2->draw();
-    }
-    /*
-
-    for (const unique_ptr<Triangle>& m : mountains) {
-        m->setUniforms();
-        m->draw();
-    }*/
-
-    ground2->setUniforms();
-    ground2->draw();
-
-    ground->setUniforms();
-    ground->draw();
 
     shapeShader.use();
 
     for(unique_ptr<Shape> &square : squares){
         square->setUniforms();
         square->draw();
+    }
+
+    // Draw the ground
+    for (const unique_ptr<Rect>& s : standingGround) {
+        s->setUniforms();
+        s->draw();
     }
 
     glfwSwapBuffers(window);
