@@ -37,7 +37,9 @@ class Engine {
 
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
-        vector<unique_ptr<Rect>> standingGround; // Generated ground the user runs on
+        //vector<unique_ptr<Rect>> standingGround; // Generated ground the user runs on
+        unique_ptr<Rect> standingGround;
+        vector<unique_ptr<Rect>> blocks; // What the user needs to jump over.
         unique_ptr<Rect> user;
         vector<unique_ptr<Triangle>> mountains; // two sets of mountains.
         vector<unique_ptr<Triangle>> mountains2;

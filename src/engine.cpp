@@ -70,18 +70,36 @@ void Engine::initShapes() {
     // Ground color
     ground2 = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, height / 3), groundColor2);
 
-    int totalGroundWidth = 0;
+
+    standingGround = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, 430), groundColor);
+/*    int totalGroundWidth = 0;
     vec2 groundSize;
-    while (totalGroundWidth < width + 500) {
+    while (totalGroundWidth < width + 600) {
         // Populate this vector of darkBlue buildings
         groundSize.y = height/2;
         // Building width between
-        groundSize.x = rand() % 301 + 200;
+        groundSize.x = 600;
 
         standingGround.push_back(make_unique<Rect>(shapeShader,
                                                vec2(totalGroundWidth + (groundSize.x / 2.0) + 5, (groundSize.y/2.0) + -30),
                                                groundSize, groundColor));
         totalGroundWidth += groundSize.x + 5;
+    }*/
+
+    int totalBlockWidth = 0;
+    vec2 blockSize;
+
+    while (totalBlockWidth < width + 60) {
+        // Populate this vector of purple buildings
+        // Building height between 300-350
+        blockSize.y = rand() % 301 + 50;
+        // Building width between 20-60
+        blockSize.x = rand() % 21 + 40;
+        blocks.push_back(make_unique<Rect>(shapeShader,
+                                               vec2(totalBlockWidth + (blockSize.x / 2.0) + 5,
+                                                    ((blockSize.y / 2.0) + 50)),
+                                               blockSize, groundColor));
+        totalBlockWidth += blockSize.x + 5;
     }
 
 
@@ -126,9 +144,6 @@ void Engine::processInput() {
         fall();
     }
 
-    for (const unique_ptr<Shape>& s : squares) {
-
-    }
 
     // If the user is overlapping with the top of the mountain,
     //  exit the program.
@@ -166,7 +181,7 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    // Update buildings
+/*    // Update buildings
     for (int i = 0; i < standingGround.size(); ++i) {
         // Move all the red buildings to the left
         standingGround[i]->moveX(-1);
@@ -175,7 +190,19 @@ void Engine::update() {
             int pos = rand() % 51 + 100;
             // Set it to the right of the screen so that it passes through again
             int buildingOnLeft = (standingGround[i] == standingGround[0]) ? standingGround.size()-1 : i - 1;
-            standingGround[i]->setPosX(standingGround[buildingOnLeft]->getPosX() + standingGround[buildingOnLeft]->getSize().x/2 + standingGround[i]->getSize().x/2 + pos);
+            standingGround[i]->setPosX(standingGround[buildingOnLeft]->getPosX() + standingGround[buildingOnLeft]->getSize().x/2 + standingGround[i]->getSize().x/2);
+        }
+    }*/
+
+    // Update buildings
+    for (int i = 0; i < blocks.size(); ++i) {
+        // Move all the red buildings to the left
+        blocks[i]->moveX(-3);
+        // If a building has moved off the screen
+        if (blocks[i]->getPosX() < -(blocks[i]->getSize().x/2)) {
+            // Set it to the right of the screen so that it passes through again
+            int buildingOnLeft = (blocks[i] == blocks[0]) ? blocks.size()-1 : i - 1;
+            blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2 + 400);
         }
     }
 
@@ -229,8 +256,11 @@ void Engine::render() {
         square->draw();
     }
 
+    standingGround->setUniforms();
+    standingGround->draw();
+
     // Draw the ground
-    for (const unique_ptr<Rect>& s : standingGround) {
+    for (const unique_ptr<Rect>& s : blocks) {
         s->setUniforms();
         s->draw();
     }
