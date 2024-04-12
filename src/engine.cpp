@@ -67,6 +67,16 @@ void Engine::initShaders() {
 
 void Engine::initShapes() {
     user = make_unique<Rect>(shapeShader, vec2(100 , height/2), vec2(100, 50), black); // placeholder for compilation
+
+    // Configure text shader and renderer
+    textShader = shaderManager->loadShader("../res/shaders/text.vert", "../res/shaders/text.frag", nullptr, "text");
+    fontRenderer = make_unique<FontRenderer>(shaderManager->getShader("text"), "../res/fonts/MxPlus_IBM_BIOS.ttf", 24);
+
+    // Set uniforms
+    textShader.setVector2f("vertex", vec4(100, 100, .5, .5));
+    shapeShader.use();
+    shapeShader.setMatrix4("projection", this->PROJECTION);
+
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
@@ -140,8 +150,6 @@ void Engine::processInput() {
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
-
-    // Get the regular position of the unicorn
 
     // if the user hits the up arrow the unicorn jumps
     if((screen == play) && keys[GLFW_KEY_UP]){
@@ -266,6 +274,10 @@ void Engine::render() {
     // Render differently depending on screen
     switch (screen) {
         case start: {
+            string message = "Press s to start";
+            // (12 * message.length()) is the offset to center text.
+            // 12 pixels is the width of each character scaled by 1.
+            //this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
             break;
         }
         case play: {
@@ -290,7 +302,6 @@ void Engine::render() {
             break;
         }
     }
-
 
     glfwSwapBuffers(window);
 }

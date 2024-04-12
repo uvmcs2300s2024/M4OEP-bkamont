@@ -8,6 +8,7 @@
 #include <memory>
 #include <GLFW/glfw3.h>
 
+#include "font/fontRenderer.h"
 #include "shader/shaderManager.h"
 #include "shapes/rect.h"
 #include "shapes/shape.h"
@@ -34,6 +35,7 @@ class Engine {
         /// @brief Responsible for loading and storing all the shaders used in the project.
         /// @details Initialized in initShaders()
         unique_ptr<ShaderManager> shaderManager;
+        unique_ptr<FontRenderer> fontRenderer;
 
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
