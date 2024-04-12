@@ -67,16 +67,6 @@ void Engine::initShaders() {
 
 void Engine::initShapes() {
     user = make_unique<Rect>(shapeShader, vec2(100 , height/2), vec2(100, 50), black); // placeholder for compilation
-
-    // Configure text shader and renderer
-    textShader = shaderManager->loadShader("../res/shaders/text.vert", "../res/shaders/text.frag", nullptr, "text");
-    fontRenderer = make_unique<FontRenderer>(shaderManager->getShader("text"), "../res/fonts/MxPlus_IBM_BIOS.ttf", 24);
-
-    // Set uniforms
-    textShader.setVector2f("vertex", vec4(100, 100, .5, .5));
-    shapeShader.use();
-    shapeShader.setMatrix4("projection", this->PROJECTION);
-
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
@@ -152,7 +142,7 @@ void Engine::processInput() {
 
 
     // if the user hits the up arrow the unicorn jumps
-    if((screen == play) && keys[GLFW_KEY_UP]){
+    if((screen == play) && keys[GLFW_KEY_SPACE]){
         if(squares[0]->getPosY() < 600){
             jump();
         }
@@ -220,7 +210,7 @@ void Engine::update() {
         if (blocks[i]->getPosX() < -(blocks[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
             int buildingOnLeft = (blocks[i] == blocks[0]) ? blocks.size()-1 : i - 1;
-            blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2 + 100);
+            blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2);
         }
     }
 
@@ -278,6 +268,7 @@ void Engine::render() {
             // (12 * message.length()) is the offset to center text.
             // 12 pixels is the width of each character scaled by 1.
             //this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
+            break;
             break;
         }
         case play: {
