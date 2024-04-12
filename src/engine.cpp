@@ -89,6 +89,10 @@ void Engine::initShapes() {
     int totalBlockWidth = 0;
     vec2 blockSize;
 
+    blocks.push_back(make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(0, 0), groundColor));
+    blocks.push_back(make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(0, 0), groundColor));
+    blocks.push_back(make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(0, 0), groundColor));
+
     while (totalBlockWidth < width + 60) {
         // Populate this vector of purple buildings
         // Building height between 300-350
@@ -147,7 +151,7 @@ void Engine::processInput() {
 
     // If the user is overlapping with the top of the mountain,
     //  exit the program.
-    for (const unique_ptr<Triangle>& m : mountains) {
+    for (const unique_ptr<Rect>& m : blocks) {
         if (m->isOverlapping(*user)) {
             glfwSetWindowShouldClose(window, true);
         }
@@ -197,12 +201,12 @@ void Engine::update() {
     // Update buildings
     for (int i = 0; i < blocks.size(); ++i) {
         // Move all the red buildings to the left
-        blocks[i]->moveX(-3);
+        blocks[i]->moveX(-.5);
         // If a building has moved off the screen
         if (blocks[i]->getPosX() < -(blocks[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
             int buildingOnLeft = (blocks[i] == blocks[0]) ? blocks.size()-1 : i - 1;
-            blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2 + 400);
+            blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2 + 100);
         }
     }
 
@@ -260,9 +264,9 @@ void Engine::render() {
     standingGround->draw();
 
     // Draw the ground
-    for (const unique_ptr<Rect>& s : blocks) {
-        s->setUniforms();
-        s->draw();
+    for (int n=0; n < blocks.size(); n++) {
+        blocks[n]->setUniforms();
+        blocks[n]->draw();
     }
 
     glfwSwapBuffers(window);
