@@ -12,6 +12,7 @@ const color mountainColorDarker(128/255.0, 193/255.0, 255/255.0);
 const color groundColor (0/255.0, 20/255.0, 77/255.0);
 const color groundColor2 (0/255.0, 92/255.0, 179/255.0);
 const color black (0/255.0, 0/255.0, 0/255.0);
+const color white (255/255.0, 255/255.0, 255/255.0);
 
 
 Engine::Engine() : keys() {
@@ -66,7 +67,6 @@ void Engine::initShaders() {
 }
 
 void Engine::initShapes() {
-    user = make_unique<Rect>(shapeShader, vec2(100 , height/2), vec2(100, 50), black); // placeholder for compilation
     // Ground color
     ground = make_unique<Rect>(shapeShader, vec2(width/2, 20), vec2(width, height / 3), groundColor);
 
@@ -91,19 +91,15 @@ void Engine::initShapes() {
         totalBlockWidth += blockSize.x + 115;
     }
 
-    // To generate clouds
-    int totalCloudWidth = 0;
-    vec2 cloudSize;
-
-    while(totalCloudWidth < width){
-
-        blockSize.y = rand() %;
-        blockSize.x = rand()%;
+    // Clouds
+    totalBlockWidth = 0;
+    while (totalBlockWidth < width + 100) {
+        blockSize.y = rand() % 51 + 50;
+        blockSize.x = rand() % 101 + 100;
         clouds.push_back(make_unique<Rect>(shapeShader,
-                                               vec2(totalCloudWidth + (cloudSize.x / 2.0) + 5,
-                                                    ((cloudSize.y / 2.0) + 50)),
-                                               cloudSize, ));
-        totalCloudWidth += cloudSize.x;
+                                               vec2(totalBlockWidth + (blockSize.x / 2.0) + 300,((blockSize.y / 2.0) + 500)),
+                                               blockSize, white));
+        totalBlockWidth += blockSize.x + 300;
     }
 
 
@@ -154,9 +150,20 @@ void Engine::processInput() {
     }
 
 
+    // If the user touches the blocks, end the game
     for (const unique_ptr<Rect>& b : blocks) {
         for(const unique_ptr<Shape>& s: squares){
             if(b->isOverlapping(*s)){
+                screen = dead;
+                switch(screen);
+            }
+        }
+    }
+
+    // If the user touched the clouds, end the game
+    for (const unique_ptr<Rect>& c : clouds) {
+        for(const unique_ptr<Shape>& s: squares){
+            if(c->isOverlapping(*s)){
                 screen = dead;
                 switch(screen);
             }
@@ -201,6 +208,18 @@ void Engine::update() {
             int buildingOnLeft = (blocks[i] == blocks[0]) ? blocks.size()-1 : i - 1;
             int num = rand() % 41 + 40;
             blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2 + num);
+        }
+    }
+
+    // Update clouds
+    for (int i = 0; i < clouds.size(); ++i) {
+        // Move all the red buildings to the left
+        clouds[i]->moveX(-0.5);
+        // If a building has moved off the screen
+        if (clouds[i]->getPosX() < -(clouds[i]->getSize().x/2)) {
+            // Set it to the right of the screen so that it passes through again
+            int buildingOnLeft = (clouds[i] == clouds[0]) ? clouds.size()-1 : i - 1;
+            clouds[i]->setPosX(clouds[buildingOnLeft]->getPosX() + clouds[buildingOnLeft]->getSize().x/2 + clouds[i]->getSize().x/2 + 100);
         }
     }
 
@@ -269,6 +288,12 @@ void Engine::render() {
 
             standingGround->setUniforms();
             standingGround->draw();
+
+            // Draw the ground
+            for (int n=0; n < clouds.size(); n++) {
+                clouds[n]->setUniforms();
+                clouds[n]->draw();
+            }
 
             // Draw the ground
             for (int n=0; n < blocks.size(); n++) {
