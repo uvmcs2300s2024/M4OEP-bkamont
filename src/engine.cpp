@@ -138,10 +138,7 @@ void Engine::processInput() {
     }
 
 
-    for (const unique_ptr<Shape>& m : squares) {
-        for(const unique_ptr<Rect>& s : blocks){
-
-        }
+    for (const unique_ptr<Rect>& b : blocks) {
     }
 }
 
@@ -243,7 +240,7 @@ void Engine::render() {
             break;
         }
         case play: {
-            for(unique_ptr<Shape> &square : squares){
+            for(unique_ptr<Shape>& square : squares){
                 square->setUniforms();
                 square->draw();
             }
