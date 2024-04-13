@@ -139,6 +139,12 @@ void Engine::processInput() {
 
 
     for (const unique_ptr<Rect>& b : blocks) {
+        for(const unique_ptr<Shape>& s: squares){
+            if(b->isOverlapping(*s)){
+                screen = dead;
+                switch(screen);
+            }
+        }
     }
 }
 
