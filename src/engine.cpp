@@ -76,6 +76,7 @@ void Engine::initShapes() {
 
     standingGround = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, 430), groundColor);
 
+    // To generate blocks
     int totalBlockWidth = 0;
     vec2 blockSize;
 
@@ -88,6 +89,21 @@ void Engine::initShapes() {
                                                vec2(totalBlockWidth + (blockSize.x / 2.0) + 100,((blockSize.y / 2.0) + 50)),
                                                blockSize, groundColor));
         totalBlockWidth += blockSize.x + 115;
+    }
+
+    // To generate clouds
+    int totalCloudWidth = 0;
+    vec2 cloudSize;
+
+    while(totalCloudWidth < width){
+
+        blockSize.y = rand() %;
+        blockSize.x = rand()%;
+        clouds.push_back(make_unique<Rect>(shapeShader,
+                                               vec2(totalCloudWidth + (cloudSize.x / 2.0) + 5,
+                                                    ((cloudSize.y / 2.0) + 50)),
+                                               cloudSize, ));
+        totalCloudWidth += cloudSize.x;
     }
 
 
