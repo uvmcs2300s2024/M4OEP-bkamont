@@ -61,9 +61,15 @@ void Engine::initShaders() {
     // Load shader into shader manager and retrieve it
     shapeShader = this->shaderManager->loadShader("../res/shaders/shape.vert", "../res/shaders/shape.frag",  nullptr, "shape");
 
-    // Set uniforms that never change
+    // Configure text shader and renderer
+    textShader = shaderManager->loadShader("../res/shaders/text.vert", "../res/shaders/text.frag", nullptr, "text");
+    fontRenderer = make_unique<FontRenderer>(shaderManager->getShader("text"), "../res/fonts/MxPlus_IBM_BIOS.ttf", 24);
+
+    // Set uniforms
+    textShader.setVector2f("vertex", vec4(100, 100, .5, .5));
     shapeShader.use();
     shapeShader.setMatrix4("projection", this->PROJECTION);
+
 }
 
 void Engine::initShapes() {
@@ -273,11 +279,9 @@ void Engine::render() {
     // Render differently depending on screen
     switch (screen) {
         case start: {
+            // Display the message on the screen
             string message = "Press s to start";
-            // (12 * message.length()) is the offset to center text.
-            // 12 pixels is the width of each character scaled by 1.
-            //this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
-            break;
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
             break;
         }
         case play: {
@@ -289,7 +293,7 @@ void Engine::render() {
             standingGround->setUniforms();
             standingGround->draw();
 
-            // Draw the ground
+            // Draw the clouds
             for (int n=0; n < clouds.size(); n++) {
                 clouds[n]->setUniforms();
                 clouds[n]->draw();
@@ -305,6 +309,9 @@ void Engine::render() {
         }
         case dead: {
             // Display the message on the screen
+            // Display the message on the screen
+            string message = "You Died";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
             break;
         }
     }

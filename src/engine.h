@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "shader/shaderManager.h"
+#include "font/fontRenderer.h"
 #include "shapes/rect.h"
 #include "shapes/shape.h"
 #include "shapes/triangle.h"
@@ -35,9 +36,7 @@ class Engine {
         /// @details Initialized in initShaders()
         unique_ptr<ShaderManager> shaderManager;
 
-
-        //TODO ask why the font isn't working.
-        //unique_ptr<FontRenderer> fontRenderer;
+        unique_ptr<FontRenderer> fontRenderer;
 
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
