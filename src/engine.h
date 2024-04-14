@@ -78,10 +78,12 @@ class Engine {
         /// @details (e.g. keyboard input, mouse input, etc.)
         void processInput();
 
-        /// @brief generates the terrain
-        /// @details
-        void jump();
+        /// @brief method that simulates the character flying while the user
+        /// presses the space button.
+        void fly();
 
+
+        /// @brief method called that simulates the character falling after flying
         void fall();
 
         void checkForCollisions();

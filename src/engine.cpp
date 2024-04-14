@@ -149,7 +149,7 @@ void Engine::processInput() {
     // while the user hits the space button, the character will go up
     if((screen == play) && keys[GLFW_KEY_SPACE]){
         if(squares[0]->getPosY() < 600){
-            jump();
+            fly();
         }
     }
 
@@ -182,7 +182,7 @@ void Engine::processInput() {
 }
 
 // Jump method to have the character jump
-void Engine::jump() {
+void Engine::fly() {
     // Loop the move position of squares
     int i  = 0;
     while(i < squares.size()){
@@ -191,7 +191,7 @@ void Engine::jump() {
     }
 }
 
-// Fall method to have the character fall after jumping.
+// Fall method to have the character fall after flying
 void Engine::fall(){
     // Loop the move position of squares
     int i  = 0;
