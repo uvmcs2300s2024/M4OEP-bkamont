@@ -54,6 +54,7 @@ unsigned int Engine::initWindow(bool debug) {
     return 0;
 }
 
+// TODO ask about the spikes spawning only when the user hits start.
 void Engine::initShaders() {
     // load shader manager
     shaderManager = make_unique<ShaderManager>();
@@ -132,12 +133,10 @@ void Engine::processInput() {
     if (keys[GLFW_KEY_ESCAPE])
         glfwSetWindowShouldClose(window, true);
 
-
     // Mouse position saved to check for collisions
     glfwGetCursorPos(window, &MouseX, &MouseY);
 
     // If we're in the start screen and the user presses s, change screen to play
-    // Hint: The index is GLFW_KEY_S
     if ((screen == start) && keys[GLFW_KEY_S]){
         screen = play;
         switch(screen);
@@ -147,13 +146,15 @@ void Engine::processInput() {
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
 
-    // if the user hits the up arrow the unicorn jumps
+    // while the user hits the space button, the character will go up
     if((screen == play) && keys[GLFW_KEY_SPACE]){
         if(squares[0]->getPosY() < 600){
             jump();
         }
     }
 
+    // If the screen is in play and the user has hit space,
+    // the character will drop until it hits the ground.
     if((screen == play) && (squares[0]->getPosY() > 362)){
         fall();
     }
