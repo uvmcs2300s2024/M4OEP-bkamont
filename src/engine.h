@@ -35,14 +35,16 @@ class Engine {
         /// @brief Responsible for loading and storing all the shaders used in the project.
         /// @details Initialized in initShaders()
         unique_ptr<ShaderManager> shaderManager;
-
         unique_ptr<FontRenderer> fontRenderer;
 
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
-        unique_ptr<Rect> standingGround; // the ground that the user is standing on
-        vector<unique_ptr<Triangle>> spikes; // What the user needs to jump over.
-        vector<unique_ptr<Rect>> clouds; // What the user needs to avoid in the sky.
+        // the ground that the user is standing on
+        unique_ptr<Rect> standingGround;
+        // What the user needs to jump over.
+        vector<unique_ptr<Triangle>> spikes;
+        // What the user needs to avoid in the sky.
+        vector<unique_ptr<Rect>> clouds;
 
         // Shapes
         vector<unique_ptr<Shape>> squares;
