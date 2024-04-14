@@ -106,4 +106,4 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${VENDORS_SOURCES})
 # Include libraries
-target_link_libraries(${PROJECT_NAME} glfw glm)
+target_link_libraries(${PROJECT_NAME} glfw glm freetype)
