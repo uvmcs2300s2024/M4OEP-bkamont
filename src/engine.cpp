@@ -181,7 +181,7 @@ void Engine::processInput() {
     }
 }
 
-// Jump method to have the character jump
+// fly method to have the character fly
 void Engine::fly() {
     // Loop the move position of squares
     int i  = 0;
