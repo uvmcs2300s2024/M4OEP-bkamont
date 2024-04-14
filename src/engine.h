@@ -41,8 +41,8 @@ class Engine {
         unique_ptr<Rect> ground;
         unique_ptr<Rect> ground2;
         unique_ptr<Rect> standingGround; // the ground that the user is standing on
-        vector<unique_ptr<Rect>> blocks; // What the user needs to jump over.
-        vector<unique_ptr<Rect>> clouds; // What the user needs to go around in the sky.
+        vector<unique_ptr<Triangle>> spikes; // What the user needs to jump over.
+        vector<unique_ptr<Rect>> clouds; // What the user needs to avoid in the sky.
 
         // Shapes
         vector<unique_ptr<Shape>> squares;

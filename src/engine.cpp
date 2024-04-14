@@ -82,25 +82,28 @@ void Engine::initShapes() {
 
     standingGround = make_unique<Rect>(shapeShader, vec2(width/2, 50), vec2(width, 430), groundColor);
 
-    // To generate blocks
-    int totalBlockWidth = 0;
-    vec2 blockSize;
+    // To generate spikes
+    int totalSpikeWidth = 0;
+    vec2 spikeSize;
 
-    while (totalBlockWidth < width + 60) {
-        // block height between 300-350
-        blockSize.y = rand() % 301 + 50;
-        // block width between 20-60
-        blockSize.x = rand() % 21 + 40;
-        blocks.push_back(make_unique<Rect>(shapeShader,
-                                               vec2(totalBlockWidth + (blockSize.x / 2.0) + 100,((blockSize.y / 2.0) + 50)),
-                                               blockSize, groundColor));
-        totalBlockWidth += blockSize.x + 115;
+    while (totalSpikeWidth < width + 70) {
+        // Spike height between 300-350
+        spikeSize.y = rand() % 301 + 50;
+        // Spike width between 20-60
+        spikeSize.x = rand() % 31 + 40;
+        spikes.push_back(make_unique<Triangle>(shapeShader,
+                                               vec2(totalSpikeWidth + (spikeSize.x / 2.0) + 100,((spikeSize.y / 2.0) + 50)),
+                                               spikeSize, groundColor));
+        totalSpikeWidth += spikeSize.x + 115;
     }
 
     // Clouds
-    totalBlockWidth = 0;
+    int totalBlockWidth = 0;
+    vec2 blockSize;
     while (totalBlockWidth < width + 100) {
+        // block height
         blockSize.y = rand() % 51 + 50;
+        // block width
         blockSize.x = rand() % 101 + 100;
         clouds.push_back(make_unique<Rect>(shapeShader,
                                                vec2(totalBlockWidth + (blockSize.x / 2.0) + 300,((blockSize.y / 2.0) + 500)),
@@ -157,7 +160,7 @@ void Engine::processInput() {
 
 
     // If the user touches the blocks, end the game
-    for (const unique_ptr<Rect>& b : blocks) {
+    for (const unique_ptr<Triangle>& b : spikes) {
         for(const unique_ptr<Shape>& s: squares){
             if(b->isOverlapping(*s)){
                 screen = dead;
@@ -204,24 +207,24 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    // Update buildings
-    for (int i = 0; i < blocks.size(); ++i) {
-        // Move all the red buildings to the left
-        blocks[i]->moveX(-1.5);
-        // If a building has moved off the screen
-        if (blocks[i]->getPosX() < -(blocks[i]->getSize().x/2)) {
+    // Update spikes
+    for (int i = 0; i < spikes.size(); ++i) {
+        // move spikes to the left
+        spikes[i]->moveX(-1.5);
+        // If a spike has moved off the screen
+        if (spikes[i]->getPosX() < -(spikes[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
-            int buildingOnLeft = (blocks[i] == blocks[0]) ? blocks.size()-1 : i - 1;
+            int buildingOnLeft = (spikes[i] == spikes[0]) ? spikes.size()-1 : i - 1;
             int num = rand() % 41 + 40;
-            blocks[i]->setPosX(blocks[buildingOnLeft]->getPosX() + blocks[buildingOnLeft]->getSize().x/2 + blocks[i]->getSize().x/2 + num);
+            spikes[i]->setPosX(spikes[buildingOnLeft]->getPosX() + spikes[buildingOnLeft]->getSize().x/2 + spikes[i]->getSize().x/2 + num);
         }
     }
 
     // Update clouds
     for (int i = 0; i < clouds.size(); ++i) {
-        // Move all the red buildings to the left
+        // Move clouds to the left
         clouds[i]->moveX(-0.5);
-        // If a building has moved off the screen
+        // If a cloud has moved off the screen
         if (clouds[i]->getPosX() < -(clouds[i]->getSize().x/2)) {
             // Set it to the right of the screen so that it passes through again
             int buildingOnLeft = (clouds[i] == clouds[0]) ? clouds.size()-1 : i - 1;
@@ -280,8 +283,12 @@ void Engine::render() {
     switch (screen) {
         case start: {
             // Display the message on the screen
-            string message = "Press s to start";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
+            string message = "Press s to start!";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 100, 1, vec3{0, 0, 0});
+            message = "Hit space to fly";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 200, 1, vec3{0, 0, 0});
+/*            message = "But make sure to avoid the blocks and clouds";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 300, .5, vec3{0, 0, 0});*/
             break;
         }
         case play: {
@@ -293,6 +300,9 @@ void Engine::render() {
             standingGround->setUniforms();
             standingGround->draw();
 
+            ground->setUniforms();
+            ground->draw();
+
             // Draw the clouds
             for (int n=0; n < clouds.size(); n++) {
                 clouds[n]->setUniforms();
@@ -300,10 +310,13 @@ void Engine::render() {
             }
 
             // Draw the ground
-            for (int n=0; n < blocks.size(); n++) {
-                blocks[n]->setUniforms();
-                blocks[n]->draw();
+            for (int n=0; n < spikes.size(); n++) {
+                spikes[n]->setUniforms();
+                spikes[n]->draw();
             }
+
+            ground2->setUniforms();
+            ground2->draw();
 
             break;
         }
@@ -311,7 +324,7 @@ void Engine::render() {
             // Display the message on the screen
             // Display the message on the screen
             string message = "You Died";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{1, 1, 1});
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
             break;
         }
     }
