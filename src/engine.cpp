@@ -154,7 +154,7 @@ void Engine::processInput() {
         }
     }
 
-    if(squares[0]->getPosY() > 362){
+    if((screen == play) && (squares[0]->getPosY() > 362)){
         fall();
     }
 
@@ -162,7 +162,7 @@ void Engine::processInput() {
     // If the user touches the blocks, end the game
     for (const unique_ptr<Triangle>& b : spikes) {
         for(const unique_ptr<Shape>& s: squares){
-            if(b->isOverlapping(*s)){
+            if(b->isOverlapping(*s) && (screen == play)){
                 screen = dead;
                 switch(screen);
             }
@@ -172,7 +172,7 @@ void Engine::processInput() {
     // If the user touched the clouds, end the game
     for (const unique_ptr<Rect>& c : clouds) {
         for(const unique_ptr<Shape>& s: squares){
-            if(c->isOverlapping(*s)){
+            if(c->isOverlapping(*s) && (screen == play)){
                 screen = dead;
                 switch(screen);
             }
@@ -274,8 +274,6 @@ void Engine::render() {
     glClearColor(background.red,background.green, background.blue, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shapeShader.use();
-
     // Set shader to use for all shapes
     shapeShader.use();
 
@@ -284,9 +282,9 @@ void Engine::render() {
         case start: {
             // Display the message on the screen
             string message = "Press s to start!";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 100, 1, vec3{0, 0, 0});
-            message = "Hit space to fly";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 200, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
+            //message = "Hit space to fly";
+            //this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 200, 1, vec3{0, 0, 0});
 /*            message = "But make sure to avoid the blocks and clouds";
             this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 300, .5, vec3{0, 0, 0});*/
             break;
