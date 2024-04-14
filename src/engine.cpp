@@ -284,11 +284,11 @@ void Engine::render() {
         case start: {
             // Display the message on the screen
             string message = "Press s to start!";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
-            message = "Hit space to fly";
             this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 200, 1, vec3{0, 0, 0});
-/*            message = "But make sure to avoid the blocks and clouds";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 300, .5, vec3{0, 0, 0});*/
+            message = "Hit space to fly";
+            this->fontRenderer->renderText(message, width/2 - (10 * message.length()), height - 300, 0.8, vec3{0, 0, 0});
+            message = "But make sure to avoid the spikes and clouds";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 400, 0.7, vec3{0, 0, 0});
             break;
         }
         case play: {
