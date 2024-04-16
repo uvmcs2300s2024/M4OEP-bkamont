@@ -359,14 +359,17 @@ void Engine::render() {
             break;
         }
         case dead: {
-            string fTime = to_string(elapsedTime);
-            string message = "Time it took: " + fTime;
-            this->fontRenderer->renderText(fTime, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
             // Display the message on the screen
+            string message;
             message = "You Died!";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/3, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
             message = ":(";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/4, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2 - 60, 1, vec3{0, 0, 0});
+            string fTime = to_string(elapsedTime);
+            message = "You survived for:";
+            this->fontRenderer->renderText(message, width/2 - (12* message.length()), height/4, 1, vec3{0, 0, 0});
+            message = fTime + " seconds";
+            this->fontRenderer->renderText(message, width/2 - (13* message.length()), height/4 - 60, 1, vec3{0, 0, 0});
             break;
         }
     }
