@@ -4,6 +4,12 @@
 enum state {start, play, dead};
 state screen;
 
+float currentTime;
+float elapsedTime;
+
+float passedTime;
+float elapsedPassedTime;
+
 using namespace std;
 
 const color background(204/255.0, 230/255.0, 255/255.0);
@@ -116,7 +122,8 @@ void Engine::initShapes() {
     readFromFile("../res/art/scene.txt");
 }
 
-void Engine::processInput() {
+void Engine::processInput() {\
+    float startTime = 0;
     glfwPollEvents();
 
     // Set keys to true if pressed, false if released
@@ -148,6 +155,7 @@ void Engine::processInput() {
 
     // while the user hits the space button, the character will go up
     if((screen == play) && keys[GLFW_KEY_SPACE]){
+        delayTimer = 10;
         if(squares[0]->getPosY() < 600){
             fly();
         }
@@ -201,44 +209,38 @@ void Engine::fall(){
     }
 }
 
-
 void Engine::update() {
     // Calculate delta time
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    delayTimer += deltaTime;
 
     if(screen == play){
+        // until the player hits space, the spikes and clouds won't move.
         if(delayTimer >= startDelay){
-            if(currentFrame - lastSpeedIncreased >= speedInterval){
-                moveSpeed -= speedIncrease;
-                lastSpeedIncreased = currentFrame;
-            }
-
             // Update spikes
             for (int i = 0; i < spikes.size(); ++i) {
                 // move spikes to the left
-                spikes[i]->moveX(moveSpeed);
+                spikes[i]->moveX(-2);
                 // If a spike has moved off the screen
                 if (spikes[i]->getPosX() < -(spikes[i]->getSize().x/2)) {
                     // Set it to the right of the screen so that it passes through again
-                    int buildingOnLeft = (spikes[i] == spikes[0]) ? spikes.size()-1 : i - 1;
+                    int spikesOnLeft = (spikes[i] == spikes[0]) ? spikes.size()-1 : i - 1;
                     int num = rand() % 41 + 40;
-                    spikes[i]->setPosX(spikes[buildingOnLeft]->getPosX() + spikes[buildingOnLeft]->getSize().x/2 + spikes[i]->getSize().x/2 + num);
+                    spikes[i]->setPosX(spikes[spikesOnLeft]->getPosX() + spikes[spikesOnLeft]->getSize().x/2 + spikes[i]->getSize().x/2 + num);
                 }
             }
 
             // Update clouds
             for (int i = 0; i < clouds.size(); ++i) {
                 // Move clouds to the left
-                clouds[i]->moveX(moveSpeed);
+                clouds[i]->moveX(-2);
                 // If a cloud has moved off the screen
                 if (clouds[i]->getPosX() < -(clouds[i]->getSize().x/2)) {
                     // Set it to the right of the screen so that it passes through again
-                    int buildingOnLeft = (clouds[i] == clouds[0]) ? clouds.size()-1 : i - 1;
-                    clouds[i]->setPosX(clouds[buildingOnLeft]->getPosX() + clouds[buildingOnLeft]->getSize().x/2 + clouds[i]->getSize().x/2 + 100);
+                    int cloudsOnLeft = (clouds[i] == clouds[0]) ? clouds.size()-1 : i - 1;
+                    clouds[i]->setPosX(clouds[cloudsOnLeft]->getPosX() + clouds[cloudsOnLeft]->getSize().x/2 + clouds[i]->getSize().x/2 + 100);
                 }
             }
         }
@@ -294,12 +296,16 @@ void Engine::render() {
     switch (screen) {
         case start: {
             // Display the message on the screen
-            string message = "Press s to start!";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
-            message = "Hit space to fly";
-            this->fontRenderer->renderText(message, width/2 - (10 * message.length()), height/3, 0.8, vec3{0, 0, 0});
-            message = "But make sure to avoid the spikes and clouds";
-            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height/4, 0.7, vec3{0, 0, 0});
+            string message = "Hit space to fly";
+            this->fontRenderer->renderText(message, width/2 - (10 * message.length()), height - 100, 0.8, vec3{0, 0, 0});
+            message = "If you stop hitting space, you will fall";
+            this->fontRenderer->renderText(message, width/2 - (9 * message.length()), height - 150, 0.7, vec3{0, 0, 0});
+            message = "But watch out for the spikes and clouds,";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 200, 0.7, vec3{0, 0, 0});
+            message = "touch one, and you die!";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 250, 0.7, vec3{0, 0, 0});
+            message = "Press s to start!";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2 - 60, 1, vec3{0, 0, 0});
             break;
         }
         case play: {
@@ -329,16 +335,35 @@ void Engine::render() {
             ground2->setUniforms();
             ground2->draw();
 
-            float currentTime = glfwGetTime();
-            float elapsedTime = currentTime - startTime;
-            int minutes = static_cast<int>(finalTime/ 60);
-            int seconds = static_cast<int>(finalTime) % 60;
+            float startTime = 0;
+
+            // Calculate the time that the user did not hit space to play.
+            if (delayTimer != 10){
+                passedTime = glfwGetTime();
+                elapsedPassedTime = passedTime - startTime;
+            }
+
+            //  Subtract the time the user didn't hit space to start from the current time from the window
+            currentTime = glfwGetTime() - elapsedPassedTime;
+            if(delayTimer == 10){
+                elapsedTime = currentTime - startTime;
+                //int minutes = static_cast<int>(finalTime/ 60);
+                //int seconds = static_cast<int>(finalTime) % 60;
+                string time = to_string(elapsedTime);
+                string message = time;
+                this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
+            }
+            // Set elapsed time equal to the calculated elapsed time
+            elapsedTime = elapsedTime;
 
             break;
         }
         case dead: {
+            string fTime = to_string(elapsedTime);
+            string message = "Time it took: " + fTime;
+            this->fontRenderer->renderText(fTime, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
             // Display the message on the screen
-            string message = "You Died!";
+            message = "You Died!";
             this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
             message = ":(";
             this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/3, 1, vec3{0, 0, 0});
