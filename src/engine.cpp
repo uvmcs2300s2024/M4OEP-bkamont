@@ -350,10 +350,10 @@ void Engine::render() {
                 //int minutes = static_cast<int>(finalTime/ 60);
                 //int seconds = static_cast<int>(finalTime) % 60;
                 string time = to_string(elapsedTime);
-                string message = time;
-                this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
+                string message = "Time elapsed: " + time;
+                this->fontRenderer->renderText(message, 50 , 100,.8, vec3{0, 0, 0});
             }
-            // Set elapsed time equal to the calculated elapsed time
+            // Set elapsed time equal to the calculated elapsed times
             elapsedTime = elapsedTime;
 
             break;
@@ -364,9 +364,9 @@ void Engine::render() {
             this->fontRenderer->renderText(fTime, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
             // Display the message on the screen
             message = "You Died!";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
-            message = ":(";
             this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/3, 1, vec3{0, 0, 0});
+            message = ":(";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/4, 1, vec3{0, 0, 0});
             break;
         }
     }
