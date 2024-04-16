@@ -127,8 +127,6 @@ void Engine::processInput() {
             keys[key] = false;
     }
 
-    int y = 0;
-
     // Close window if escape key is pressed
     if (keys[GLFW_KEY_ESCAPE])
         glfwSetWindowShouldClose(window, true);
@@ -139,7 +137,9 @@ void Engine::processInput() {
     // If we're in the start screen and the user presses s, change screen to play
     if ((screen == start) && keys[GLFW_KEY_S]){
         screen = play;
-        switch(screen);
+        delayTimer = 0;
+        startTime = glfwGetTime();
+        lastTime = glfwGetTime();
     }
 
     // Update mouse rect to follow mouse
@@ -208,28 +208,39 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    // Update spikes
-    for (int i = 0; i < spikes.size(); ++i) {
-        // move spikes to the left
-        spikes[i]->moveX(-1.5);
-        // If a spike has moved off the screen
-        if (spikes[i]->getPosX() < -(spikes[i]->getSize().x/2)) {
-            // Set it to the right of the screen so that it passes through again
-            int buildingOnLeft = (spikes[i] == spikes[0]) ? spikes.size()-1 : i - 1;
-            int num = rand() % 41 + 40;
-            spikes[i]->setPosX(spikes[buildingOnLeft]->getPosX() + spikes[buildingOnLeft]->getSize().x/2 + spikes[i]->getSize().x/2 + num);
-        }
-    }
+    delayTimer += deltaTime;
 
-    // Update clouds
-    for (int i = 0; i < clouds.size(); ++i) {
-        // Move clouds to the left
-        clouds[i]->moveX(-0.5);
-        // If a cloud has moved off the screen
-        if (clouds[i]->getPosX() < -(clouds[i]->getSize().x/2)) {
-            // Set it to the right of the screen so that it passes through again
-            int buildingOnLeft = (clouds[i] == clouds[0]) ? clouds.size()-1 : i - 1;
-            clouds[i]->setPosX(clouds[buildingOnLeft]->getPosX() + clouds[buildingOnLeft]->getSize().x/2 + clouds[i]->getSize().x/2 + 100);
+    if(screen == play){
+        if(delayTimer >= startDelay){
+            if(currentFrame - lastSpeedIncreased >= speedInterval){
+                moveSpeed -= speedIncrease;
+                lastSpeedIncreased = currentFrame;
+            }
+
+            // Update spikes
+            for (int i = 0; i < spikes.size(); ++i) {
+                // move spikes to the left
+                spikes[i]->moveX(moveSpeed);
+                // If a spike has moved off the screen
+                if (spikes[i]->getPosX() < -(spikes[i]->getSize().x/2)) {
+                    // Set it to the right of the screen so that it passes through again
+                    int buildingOnLeft = (spikes[i] == spikes[0]) ? spikes.size()-1 : i - 1;
+                    int num = rand() % 41 + 40;
+                    spikes[i]->setPosX(spikes[buildingOnLeft]->getPosX() + spikes[buildingOnLeft]->getSize().x/2 + spikes[i]->getSize().x/2 + num);
+                }
+            }
+
+            // Update clouds
+            for (int i = 0; i < clouds.size(); ++i) {
+                // Move clouds to the left
+                clouds[i]->moveX(moveSpeed);
+                // If a cloud has moved off the screen
+                if (clouds[i]->getPosX() < -(clouds[i]->getSize().x/2)) {
+                    // Set it to the right of the screen so that it passes through again
+                    int buildingOnLeft = (clouds[i] == clouds[0]) ? clouds.size()-1 : i - 1;
+                    clouds[i]->setPosX(clouds[buildingOnLeft]->getPosX() + clouds[buildingOnLeft]->getSize().x/2 + clouds[i]->getSize().x/2 + 100);
+                }
+            }
         }
     }
 
@@ -317,6 +328,11 @@ void Engine::render() {
 
             ground2->setUniforms();
             ground2->draw();
+
+            float currentTime = glfwGetTime();
+            float elapsedTime = currentTime - startTime;
+            int minutes = static_cast<int>(finalTime/ 60);
+            int seconds = static_cast<int>(finalTime) % 60;
 
             break;
         }
