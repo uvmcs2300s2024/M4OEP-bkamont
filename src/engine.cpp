@@ -1,7 +1,7 @@
 #include "engine.h"
 #include <iostream>
 
-enum state {start, play, dead};
+enum state {start,directions, play, dead};
 state screen;
 
 float currentTime;
@@ -142,20 +142,25 @@ void Engine::processInput() {\
     glfwGetCursorPos(window, &MouseX, &MouseY);
 
     // If we're in the start screen and the user presses s, change screen to play
-    if ((screen == start) && keys[GLFW_KEY_S]){
+    if ((screen == start) && keys[GLFW_KEY_C]){
+        screen = directions;
+    }
+
+    if ((screen == directions) && keys[GLFW_KEY_S]){
         screen = play;
-        delayTimer = 0;
+        // Set start
         startTime = glfwGetTime();
         lastTime = glfwGetTime();
     }
+    // If we're in the start screen and the user presses s, change screen to play
 
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
-
     // while the user hits the space button, the character will go up
     if((screen == play) && keys[GLFW_KEY_SPACE]){
-        delayTimer = 10;
+        // set delay time to 1 so that the things start moving when the user hits space.
+        delayTime = 1;
         if(squares[0]->getPosY() < 600){
             fly();
         }
@@ -187,6 +192,21 @@ void Engine::processInput() {\
             }
         }
     }
+
+    // supersonic speed
+    if((screen == directions) && (keys[GLFW_KEY_RIGHT])){
+        speed = -4;
+    }
+
+    // increased speed
+    if((screen == directions) && (keys[GLFW_KEY_UP])){
+        speed = -3;
+    }
+
+    // decreased speed
+    if((screen == directions) && (keys[GLFW_KEY_DOWN])){
+        speed = -1;
+    }
 }
 
 // fly method to have the character fly
@@ -215,14 +235,13 @@ void Engine::update() {
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-
     if(screen == play){
         // until the player hits space, the spikes and clouds won't move.
-        if(delayTimer >= startDelay){
+        if(delayTime >= startDelay){
             // Update spikes
             for (int i = 0; i < spikes.size(); ++i) {
                 // move spikes to the left
-                spikes[i]->moveX(-2);
+                spikes[i]->moveX(speed);
                 // If a spike has moved off the screen
                 if (spikes[i]->getPosX() < -(spikes[i]->getSize().x/2)) {
                     // Set it to the right of the screen so that it passes through again
@@ -235,7 +254,7 @@ void Engine::update() {
             // Update clouds
             for (int i = 0; i < clouds.size(); ++i) {
                 // Move clouds to the left
-                clouds[i]->moveX(-2);
+                clouds[i]->moveX(speed);
                 // If a cloud has moved off the screen
                 if (clouds[i]->getPosX() < -(clouds[i]->getSize().x/2)) {
                     // Set it to the right of the screen so that it passes through again
@@ -245,7 +264,6 @@ void Engine::update() {
             }
         }
     }
-
 }
 
 // Draws the unicorn
@@ -304,7 +322,21 @@ void Engine::render() {
             this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 200, 0.7, vec3{0, 0, 0});
             message = "touch one, and you die!";
             this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 250, 0.7, vec3{0, 0, 0});
-            message = "Press s to start!";
+            message = "Press C to continue!";
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2 - 60, 1, vec3{0, 0, 0});
+            break;
+        }
+        case directions: {
+            string message;
+            message = "Hit nothing to play the default speed!";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 100, 0.7, vec3{0, 0, 0});
+            message = "Hit the up error to go fast!";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 150, 0.7, vec3{0, 0, 0});
+            message = "Hit the down error to go slow!";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 200, 0.7, vec3{0, 0, 0});
+            message = "Hit the right error to go supersonic!";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 250, 0.7, vec3{0, 0, 0});
+            message = "Press S to start!";
             this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2 - 60, 1, vec3{0, 0, 0});
             break;
         }
@@ -338,14 +370,16 @@ void Engine::render() {
             float startTime = 0;
 
             // Calculate the time that the user did not hit space to play.
-            if (delayTimer != 10){
+            if (delayTime != 1){
                 passedTime = glfwGetTime();
                 elapsedPassedTime = passedTime - startTime;
+                string message = "Hit space to start!";
+                this->fontRenderer->renderText(message, 50 , 100,.8, vec3{0, 0, 0});
             }
 
             //  Subtract the time the user didn't hit space to start from the current time from the window
             currentTime = glfwGetTime() - elapsedPassedTime;
-            if(delayTimer == 10){
+            if(delayTime == 1){
                 elapsedTime = currentTime - startTime;
                 //int minutes = static_cast<int>(finalTime/ 60);
                 //int seconds = static_cast<int>(finalTime) % 60;

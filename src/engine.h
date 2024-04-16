@@ -57,9 +57,7 @@ class Engine {
 
         const int SIDE_LENGTH = 5;
 
-        float lastSpeedIncreased = 0;
-
-        float speedIncrease = 1;
+        float speed = -1.5;
 
         float speedInterval = 15.0f;
 
@@ -67,9 +65,9 @@ class Engine {
 
         float lastTime = 0;
 
-        float startDelay = 10;
+        float startDelay = 1;
 
-        float delayTimer = 0;
+        float delayTime = 0;
 
     public:
         /// @brief Constructor for the Engine class.
