@@ -94,10 +94,11 @@ void Engine::initShapes() {
     vec2 spikeSize;
 
     while (totalSpikeWidth < width + 70) {
-        // Spike height between 300-350
-        spikeSize.y = rand() % 301 + 50;
-        // Spike width between 20-60
+        // Spike height
+        spikeSize.y = rand() % 301 + 60;
+        // Spike width
         spikeSize.x = rand() % 31 + 40;
+
         spikes.push_back(make_unique<Triangle>(shapeShader,
                                                vec2(totalSpikeWidth + (spikeSize.x / 2.0) + 100,((spikeSize.y / 2.0) + 50)),
                                                spikeSize, groundColor));
@@ -112,8 +113,9 @@ void Engine::initShapes() {
         blockSize.y = rand() % 51 + 50;
         // block width
         blockSize.x = rand() % 101 + 100;
+        int height = rand() % 11 + 10;
         clouds.push_back(make_unique<Rect>(shapeShader,
-                                               vec2(totalBlockWidth + (blockSize.x / 2.0) + 300,((blockSize.y / 2.0) + 500)),
+                                               vec2(totalBlockWidth + (blockSize.x / 2.0) + 300,((blockSize.y / 2.0) + 487 + height)),
                                                blockSize, white));
         totalBlockWidth += blockSize.x + 300;
     }
@@ -149,15 +151,12 @@ void Engine::processInput() {\
     // If we are in the directions screen and the user presses s, switch to play
     if ((screen == directions) && keys[GLFW_KEY_S]){
         screen = play;
-        // Set start
-        startTime = glfwGetTime();
-        lastTime = glfwGetTime();
     }
 
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
 
-    // while the user hits the space button, the character will go up
+    // if the screen is in play and the user hits space, have the unicorn fly
     if((screen == play) && keys[GLFW_KEY_SPACE]){
         // set delay time to 1 so that the things start moving when the user hits space.
         delayTime = 1;
@@ -177,7 +176,7 @@ void Engine::processInput() {\
     }
 
 
-    // If the user touches the blocks, end the game
+    // If the user overlaps with the blocks, end the game
     for (const unique_ptr<Triangle>& b : spikes) {
         for(const unique_ptr<Shape>& s: squares){
             if(b->isOverlapping(*s) && (screen == play)){
@@ -187,7 +186,7 @@ void Engine::processInput() {\
         }
     }
 
-    // If the user touched the clouds, end the game
+    // If the user overlaps with the clouds, end the game
     for (const unique_ptr<Rect>& c : clouds) {
         for(const unique_ptr<Shape>& s: squares){
             if(c->isOverlapping(*s) && (screen == play)){
@@ -197,17 +196,22 @@ void Engine::processInput() {\
         }
     }
 
-    // supersonic speed
+    // If the user is in the directions screen and the right key is pressed,
+    // set the speed to -6
     if((screen == directions) && (keys[GLFW_KEY_RIGHT])){
         speed = -6;
     }
 
-    // increased speed
+
+    // If the user is in the directions screen and the up key is pressed,
+    // set the speed to -3
     if((screen == directions) && (keys[GLFW_KEY_UP])){
         speed = -3;
     }
 
-    // decreased speed
+
+    // If the user is in the directions screen and the down key is pressed,
+    // set the speed to -1
     if((screen == directions) && (keys[GLFW_KEY_DOWN])){
         speed = -1;
     }
@@ -223,7 +227,7 @@ void Engine::fly() {
     }
 }
 
-// Fall method to have the character fall after flying
+// Fall method to have the character fall when the user is not hitting space
 void Engine::fall(){
     // Loop the move position of squares
     int i  = 0;
@@ -385,8 +389,6 @@ void Engine::render() {
             currentTime = glfwGetTime() - elapsedPassedTime;
             if(delayTime == 1){
                 elapsedTime = currentTime - startTime;
-                //int minutes = static_cast<int>(finalTime/ 60);
-                //int seconds = static_cast<int>(finalTime) % 60;
                 string time = to_string(elapsedTime);
                 string message = "Time elapsed: " + time;
                 this->fontRenderer->renderText(message, 50 , 100,.8, vec3{0, 0, 0});

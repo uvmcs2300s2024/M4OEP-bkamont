@@ -59,12 +59,6 @@ class Engine {
 
         float speed = -1.5;
 
-        float speedInterval = 15.0f;
-
-        float finalTime = 0;
-
-        float lastTime = 0;
-
         float startDelay = 1;
 
         float delayTime = 0;
