@@ -152,6 +152,11 @@ void Engine::processInput() {\
         startTime = glfwGetTime();
         lastTime = glfwGetTime();
     }
+
+    // if in dead screen and the user hits R, set the screen back to the start.
+    if((screen== dead) && keys[GLFW_KEY_R]){
+        screen = start;
+    }
     // If we're in the start screen and the user presses s, change screen to play
 
     // Update mouse rect to follow mouse
@@ -396,14 +401,16 @@ void Engine::render() {
             // Display the message on the screen
             string message;
             message = "You Died!";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 100, 1, vec3{0, 0, 0});
             message = ":(";
-            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height/2 - 60, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (12 * message.length()), height - 150, 1, vec3{0, 0, 0});
             string fTime = to_string(elapsedTime);
             message = "You survived for:";
-            this->fontRenderer->renderText(message, width/2 - (12* message.length()), height/4, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (12* message.length()), height - 200, 1, vec3{0, 0, 0});
             message = fTime + " seconds";
-            this->fontRenderer->renderText(message, width/2 - (13* message.length()), height/4 - 60, 1, vec3{0, 0, 0});
+            this->fontRenderer->renderText(message, width/2 - (13* message.length()), height - 250, 1, vec3{0, 0, 0});
+            message = "Press the R to replay, and esc to exit.";
+            this->fontRenderer->renderText(message, width/2 - (9.5* message.length()), height/2 - 60, .8, vec3{0, 0, 0});
             break;
         }
     }
