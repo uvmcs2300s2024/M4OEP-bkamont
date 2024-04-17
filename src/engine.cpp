@@ -146,18 +146,13 @@ void Engine::processInput() {\
         screen = directions;
     }
 
+    // If we are in the directions screen and the user presses s, switch to play
     if ((screen == directions) && keys[GLFW_KEY_S]){
         screen = play;
         // Set start
         startTime = glfwGetTime();
         lastTime = glfwGetTime();
     }
-
-    // if in dead screen and the user hits R, set the screen back to the start.
-    if((screen== dead) && keys[GLFW_KEY_R]){
-        screen = start;
-    }
-    // If we're in the start screen and the user presses s, change screen to play
 
     // Update mouse rect to follow mouse
     MouseY = height - MouseY; // make sure mouse y-axis isn't flipped
@@ -166,8 +161,12 @@ void Engine::processInput() {\
     if((screen == play) && keys[GLFW_KEY_SPACE]){
         // set delay time to 1 so that the things start moving when the user hits space.
         delayTime = 1;
-        if(squares[0]->getPosY() < 600){
+        if(squares[0]->getPosY()){
             fly();
+        }
+        // If the user hits the top of the window they die.
+        if(squares[0]->getPosY() > 600){
+            screen = dead;
         }
     }
 
@@ -200,7 +199,7 @@ void Engine::processInput() {\
 
     // supersonic speed
     if((screen == directions) && (keys[GLFW_KEY_RIGHT])){
-        speed = -4;
+        speed = -6;
     }
 
     // increased speed
@@ -319,8 +318,8 @@ void Engine::render() {
     switch (screen) {
         case start: {
             // Display the message on the screen
-            string message = "Hit space to fly";
-            this->fontRenderer->renderText(message, width/2 - (10 * message.length()), height - 100, 0.8, vec3{0, 0, 0});
+            string message = "Hit space to fly, but don't touch the top.";
+            this->fontRenderer->renderText(message, width/2 - (8.5 * message.length()), height - 100, 0.7, vec3{0, 0, 0});
             message = "If you stop hitting space, you will fall";
             this->fontRenderer->renderText(message, width/2 - (9 * message.length()), height - 150, 0.7, vec3{0, 0, 0});
             message = "But watch out for the spikes and clouds,";
@@ -409,7 +408,7 @@ void Engine::render() {
             this->fontRenderer->renderText(message, width/2 - (12* message.length()), height - 200, 1, vec3{0, 0, 0});
             message = fTime + " seconds";
             this->fontRenderer->renderText(message, width/2 - (13* message.length()), height - 250, 1, vec3{0, 0, 0});
-            message = "Press the R to replay, and esc to exit.";
+            message = "Press esc to exit.";
             this->fontRenderer->renderText(message, width/2 - (9.5* message.length()), height/2 - 60, .8, vec3{0, 0, 0});
             break;
         }
