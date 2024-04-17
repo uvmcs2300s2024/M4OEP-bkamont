@@ -8,4 +8,15 @@ I was originally planning to take a different approach to this project. I wanted
 ## Citations
 I used the bases of runners for the project and implemented 8-bit for the unicorn.
 ## Grade
-I think my program utilized the information I have learned to create a solid simple game. I studied the functions in the classes and played with numbers to figure out how to use the stuff I knew to implement things we didn't do in class. My game is usable and flexible for people to change the speed if they need to. I also put a lot of time into the project, making commits and pushes over a few days. I ended up changing plans a lot along the way which did affect my final project, but I think overall I am pretty happy with it and believe I deserve a satisfactory grade. I have a lot of ideas for future projects coming out of this module and belief I could use this game as a basis for that rendition of Robot Unicorn Attack I plan to make some day. 
+I think my program utilized the information I have learned to create a solid simple game. I studied the functions in the classes and played with numbers to figure out how to use the stuff I knew to implement things we didn't do in class. I implemented most of the things from this module and  my game is usable and flexible for people to change the speed if they need to. I also put a lot of time into the project, making commits and pushes over a few days. I ended up changing plans a lot along the way which did affect my final project, but I think overall I am pretty happy with it and believe I deserve a satisfactory grade. I have a lot of ideas for future projects coming out of this module and belief I could use this game as a basis for that rendition of Robot Unicorn Attack I plan to make some day.
+
+## concepts used
+-used OpenGl and GLFW
+-Drawing
+-Keyboard input(s)
+-Mouse input(s)
+-Multiple screens in the same graphics window
+-Graphics with C++ classes
+
+Unsure if the following applies:
+-Non-input-based event
